@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    image: movies-api:local
+    container_name: movies-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      # si usas http para dev: ASPNETCORE_URLS: http://+:8080
+      Mongo__User: "root"
+      Mongo__Password: "rootpass"
+      Mongo__Host: "192.168.0.6"   # o 'mongo' si lo corres en compose
+      Mongo__Port: "27017"
+      Mongo__Database: "movies_dev"
+      Redis__Host: "192.168.0.6"   # o 'redis' si lo corres en compose
+      Redis__Port: "6379"
+      Redis__InstanceName: "movieapi:"
+      Redis__AbortConnect: "false"
+      Redis__Ssl: "false"
+      Redis__DefaultDatabase: "0"
+    ports:
+      - "8080:8080"
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+      args:
+        # Estas dos controlan el rewrite en build
+        USE_DOCKER_REWRITE: "true"
+        API_INTERNAL_URL: "http://api:8080"   # host interno de Docker
+        # El cliente openapi usa rutas /api/v1/...; baseUrl vacío = same-origin
+        NEXT_PUBLIC_API_BASE_URL: ""
+    image: movies-web:local
+    container_name: movies-web
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api

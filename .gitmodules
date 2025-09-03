@@ -1,0 +1,6 @@
+[submodule "api"]
+	path = api
+	url = https://github.com/jhonlpjr/movie-api-net-core.git
+[submodule "web"]
+	path = web
+	url = https://github.com/jhonlpjr/movies-frontend-next.git
